@@ -1,3 +1,4 @@
 click
 apscheduler
 BeautifulSoup4
+selenium

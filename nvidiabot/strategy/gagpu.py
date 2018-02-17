@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from urllib.request import urlopen
+from selenium import webdriver
 
 from nvidiabot.strategy import BaseStrategy
 
@@ -30,34 +30,32 @@ class GAGPU(BaseStrategy):
         self.are_gpus_in_stock()
 
     def are_gpus_in_stock(self):
-        nvidia_url = 'https://www.nvidia.com/en-us/geforce/products/10series/geforce-store/'
-        nvidia_html = urlopen(nvidia_url)
+        url = 'https://www.nvidia.com/en-us/geforce/products/10series/geforce-store/'
 
-        nvidia_soap = BeautifulSoup(nvidia_html, 'html.parser')
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
 
-        nvidia_section_box = nvidia_soap.find('div', attrs={
+        client = webdriver.Chrome(chrome_options=options)
+        client.get(url)
+
+        soap = BeautifulSoup(client.page_source, 'html.parser')
+        gpu_section_div = soap.find('div', attrs={
             'id': 'section-2'
         })
 
-        nvidia_product_divs = nvidia_section_box.div.find_all('div', recursive=False)
+        gpu_info_divs = gpu_section_div.div.find_all('div', recursive=False)
 
-        for d in nvidia_product_divs:
-            product_name = d.h2.text.strip()
+        for d in gpu_info_divs:
+            name_tag = d.find(class_='product-heading1')
+            button_tag = d.find(class_='cta-preorder mobile-top')
 
-            print(d.div)
+            if not button_tag:
+                button_tag = d.find(class_='varient-button-wrapper')
 
-        # for product_col in nvidia_section_box.div.children:
-        #     print(product_col['class'])
+            gpu_name = name_tag.text.strip()
+            gpu_btn_msg = button_tag.a.div.text.strip()
 
-        # nvidia_section_cols = nvidia_section_box.div.find_next_siblings('div')
-        #
-        # print(len(nvidia_section_cols))
+            print(gpu_name)
+            print(gpu_btn_msg)
 
-        # print(nvidia_section_cols[0].find(attrs={
-        #     'class': 'product-heading1'
-        # }).text.strip())
-
-        # print(nvidia_section_cols[0].h2)
-
-        # for nvs_col in nvidia_section_cols:
-        #     print(nvs_col['class'])
+        client.close()
