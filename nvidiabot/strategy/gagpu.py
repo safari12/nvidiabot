@@ -9,17 +9,9 @@ from email.mime.text import MIMEText
 from nvidiabot.strategy import BaseStrategy
 
 
-def is_gpu_available(gpu):
-    status = gpu['status'].lower()
-
-    return \
-        'notify' not in status and \
-        'cart' in status
-
-
 class GAGPU(BaseStrategy):
 
-    def __init__(self, config):
+    def __init__(self):
         super().__init__(
             name='get available gpu',
             description='notify users by email if nvidia gpus are in stock',
@@ -32,29 +24,27 @@ class GAGPU(BaseStrategy):
                     'require'
                 ]
             }],
-            duration='random times every hour with 1200 seconds of jitter'
+            duration='random times every hour with 1200 seconds of jitter',
+            config_key='strategy.gagpu'
         )
 
-        self.emails = config['emails']
+        self.emails = None
 
     def run(self):
-        print("Emails " + ', '.join(self.emails))
-
         gpus = self.get_gpus_from_website()
+        available_gpus = self.get_available_gpus(gpus)
 
-        self.send_email([{
-            'name': '1070'
-        }, {
-            'name': '1080'
-        }, {
-            'name': '1060'
-        }])
+        if len(available_gpus) > 0:
+            self.send_email(available_gpus)
 
-        for gpu in gpus:
-            if is_gpu_available(gpu):
-                print('GPU is available')
+    @property
+    def config(self):
+        return super().config()
 
-        print('done')
+    @config.setter
+    def config(self, value):
+        self.emails = value['emails']
+        super().config(value)
 
     def send_email(self, available_gpus):
         from_addr = 'cryptoinfo69@gmail.com'
@@ -85,6 +75,18 @@ class GAGPU(BaseStrategy):
             msg=msg.as_string()
         )
         server.quit()
+
+    @staticmethod
+    def get_available_gpus(gpus):
+        available_gpus = []
+
+        for gpu in gpus:
+            status = gpu['status'].lower()
+
+            if 'notify' not in status and 'cart' in status:
+                available_gpus.append(gpu)
+
+        return available_gpus
 
     @staticmethod
     def get_gpus_from_website():
