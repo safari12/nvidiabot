@@ -13,7 +13,8 @@ def app():
         config={
             'emails': [
                 'rsafari.s@gmail.com',
-                'dsafari0@gmail.com'
+                'safarimining12@gmail.com',
+                'rezasafari@icloud.com'
             ]
         }
     )
