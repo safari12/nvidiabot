@@ -31,9 +31,9 @@ def app(config):
         duration = config_file['strategy'][s.config_key]['duration']
         scheduler.add_job(s.run, 'interval', **duration)
 
-    scheduler.start()
-
     logger.info('Scheduler has started')
+
+    scheduler.start()
 
 
 def setup_logger():
