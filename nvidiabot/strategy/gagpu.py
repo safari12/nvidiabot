@@ -1,5 +1,6 @@
 import smtplib
 import os
+import logging
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -29,22 +30,23 @@ class GAGPU(BaseStrategy):
         )
 
         self.emails = None
+        self.logger = logging.getLogger('nvidiabot')
 
     def run(self):
-        print("running gagpu strategy")
-
+        self.logger.info('Checking if Nvidia GPUs are in stock')
         gpus = self.get_gpus_from_website()
         available_gpus = self.get_available_gpus(gpus)
 
         if len(available_gpus) > 0:
+            self.logger.info('Nvidia GPUs are in stock!, notifying users')
             self.send_email(available_gpus)
+        else:
+            self.logger.info('Nvidia GPUs are not in stock :(')
 
     def set_config(self, config):
         self.emails = config['emails']
 
     def send_email(self, available_gpus):
-        print("sending emails")
-
         from_addr = 'cryptoinfo69@gmail.com'
         username = os.environ['NVB_SMTP_USERNAME']
         password = os.environ['NVB_SMTP_PASSWORD']
@@ -73,8 +75,6 @@ class GAGPU(BaseStrategy):
             msg=msg.as_string()
         )
         server.quit()
-
-        print("done sending emails")
 
     @staticmethod
     def get_available_gpus(gpus):
