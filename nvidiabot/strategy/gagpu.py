@@ -1,11 +1,11 @@
-import smtplib
-import os
 import logging
+import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 from nvidiabot.strategy import BaseStrategy
 
@@ -94,6 +94,8 @@ class GAGPU(BaseStrategy):
 
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
 
         client = webdriver.Chrome(chrome_options=options)
         client.get(url)
