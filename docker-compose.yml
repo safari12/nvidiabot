@@ -1,0 +1,6 @@
+version: '3'
+services:
+  nvidiabot:
+    build: .
+    volumes:
+      - ./config:/nvidiabot/config

@@ -35,4 +35,4 @@ RUN python3 setup.py install
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-ENTRYPOINT ["nvidiabot", "-c", "config.json"]
+ENTRYPOINT ["nvidiabot", "-c", "./config/config.json"]
