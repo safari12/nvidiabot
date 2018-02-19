@@ -4,3 +4,6 @@ services:
     build: .
     volumes:
       - ./config:/nvidiabot/config
+    environment:
+      - NVB_SMTP_USERNAME=${NVB_SMTP_USERNAME}
+      - NVB_SMTP_PASSWORD=${NVB_SMTP_PASSWORD}
