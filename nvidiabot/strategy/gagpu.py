@@ -25,28 +25,26 @@ class GAGPU(BaseStrategy):
                 ]
             }],
             duration='random times every hour with 1200 seconds of jitter',
-            config_key='strategy.gagpu'
+            config_key='gagpu'
         )
 
         self.emails = None
 
     def run(self):
+        print("running gagpu strategy")
+
         gpus = self.get_gpus_from_website()
         available_gpus = self.get_available_gpus(gpus)
 
         if len(available_gpus) > 0:
             self.send_email(available_gpus)
 
-    @property
-    def config(self):
-        return super().config()
-
-    @config.setter
-    def config(self, value):
-        self.emails = value['emails']
-        super().config(value)
+    def set_config(self, config):
+        self.emails = config['emails']
 
     def send_email(self, available_gpus):
+        print("sending emails")
+
         from_addr = 'cryptoinfo69@gmail.com'
         username = os.environ['NVB_SMTP_USERNAME']
         password = os.environ['NVB_SMTP_PASSWORD']
@@ -75,6 +73,8 @@ class GAGPU(BaseStrategy):
             msg=msg.as_string()
         )
         server.quit()
+
+        print("done sending emails")
 
     @staticmethod
     def get_available_gpus(gpus):
