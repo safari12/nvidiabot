@@ -53,3 +53,5 @@ venv/
 
 *.egg-info/
 dist/
+
+__pycache__
