@@ -1,8 +1,8 @@
-import click
 import json
-import os
 import logging
+import os
 
+import click
 from apscheduler.schedulers.background import BlockingScheduler
 
 from nvidiabot.strategy.gagpu import GAGPU
@@ -11,10 +11,14 @@ from nvidiabot.strategy.gagpu import GAGPU
 @click.command()
 @click.option('--config', '-c', help='path to config json file')
 def app(config):
-    setup_logging()
+    logger = setup_logger()
+
+    logger.info('Welcome to Nvidia Bot')
 
     path = os.path.expanduser(config)
     config_file = read_json_file(path)
+
+    logger.info('Adding strategies to job scheduler')
 
     scheduler = BlockingScheduler()
 
@@ -29,8 +33,10 @@ def app(config):
 
     scheduler.start()
 
+    logger.info('Scheduler has started')
 
-def setup_logging():
+
+def setup_logger():
     formatter = logging.Formatter(
         fmt='%(asctime)s - %(name)s - %(module)s - %(levelname)s - %(message)s'
     )
@@ -41,6 +47,8 @@ def setup_logging():
     logger = logging.getLogger('nvidiabot')
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+
+    return logger
 
 
 def read_json_file(path):

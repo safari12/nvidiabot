@@ -6,12 +6,12 @@ with open('requirements.txt') as requirements:
 setup(
     name='nvidiabot',
     version='1.0.0',
-    packages=['nvidiabot'],
+    packages=['nvidiabot', 'nvidiabot.strategy'],
     install_requires=install_requires,
     keywords='nvidiabot bot',
     entry_points={
         'console_scripts': [
-            'nvidiabot = nvidiabot.__main__:app'
+            'nvidiabot = nvidiabot.__main__:main'
         ]
     }
 )

@@ -1,5 +1,9 @@
 from nvidiabot import cli
 
 
-if __name__ == '__main__':
+def main():
     cli.app()
+
+
+if __name__ == '__main__':
+    main()
