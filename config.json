@@ -1,0 +1,15 @@
+{
+  "strategy": {
+    "gagpu": {
+      "emails": [
+        "rsafari.s@gmail.com",
+        "rezasafari@icloud.com",
+        "safarimining12@gmail.com"
+      ],
+      "duration": {
+        "seconds": 10,
+        "jitter": 5
+      }
+    }
+  }
+}
