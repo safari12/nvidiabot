@@ -13,23 +13,14 @@ from nvidiabot.strategy.gagpu import GAGPU
 def app(config):
     logger = setup_logger()
 
-    logger.info('Welcome to Nvidia Bot')
+    logger.info('Welcome to NVIDIA Bot')
 
     path = os.path.expanduser(config)
     config_file = read_json_file(path)
 
-    logger.info('Adding strategies to job scheduler')
+    logger.info('Strategy Scheduler created')
 
-    scheduler = BlockingScheduler()
-
-    strategies = [
-        GAGPU()
-    ]
-
-    for s in strategies:
-        s.set_config(config_file['strategy'][s.config_key])
-        duration = config_file['strategy'][s.config_key]['duration']
-        scheduler.add_job(s.run, 'interval', **duration)
+    scheduler = create_strategy_scheduler(config_file)
 
     logger.info('Scheduler has started')
 
@@ -54,3 +45,18 @@ def setup_logger():
 def read_json_file(path):
     with open(path) as f:
         return json.load(f)
+
+
+def create_strategy_scheduler(config_file):
+    scheduler = BlockingScheduler()
+
+    strategies = [
+        GAGPU()
+    ]
+
+    for s in strategies:
+        s.set_config(config_file['strategy'][s.config_key])
+        duration = config_file['strategy'][s.config_key]['duration']
+        scheduler.add_job(s.run, 'interval', **duration)
+
+    return scheduler

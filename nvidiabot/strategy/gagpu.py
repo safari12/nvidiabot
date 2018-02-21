@@ -7,10 +7,10 @@ from email.mime.text import MIMEText
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
-from nvidiabot.strategy import BaseStrategy
+from nvidiabot.strategy import Strategy
 
 
-class GAGPU(BaseStrategy):
+class GAGPU(Strategy):
 
     def __init__(self):
         super().__init__(
@@ -25,7 +25,6 @@ class GAGPU(BaseStrategy):
                     'require'
                 ]
             }],
-            duration='random times every hour with 1200 seconds of jitter',
             config_key='gagpu'
         )
 
@@ -34,17 +33,19 @@ class GAGPU(BaseStrategy):
 
     def run(self):
         self.logger.info('Checking if Nvidia GPUs are in stock')
-        gpus = self.get_gpus_from_website()
-        available_gpus = self.get_available_gpus(gpus)
 
-        if len(available_gpus) > 0:
+        gpus = self.get_gpus_from_website()
+        stock_gpus = self.are_gpus_in_stock(gpus)
+
+        if len(stock_gpus) > 0:
             self.logger.info('Nvidia GPUs are in stock!, notifying users')
-            self.send_email(available_gpus)
+            self.send_email(stock_gpus)
         else:
             self.logger.info('Nvidia GPUs are not in stock :(')
 
     def set_config(self, config):
         self.emails = config['emails']
+        super(GAGPU, self).set_config(config)
 
     def send_email(self, available_gpus):
         from_addr = 'cryptoinfo69@gmail.com'
@@ -77,16 +78,16 @@ class GAGPU(BaseStrategy):
         server.quit()
 
     @staticmethod
-    def get_available_gpus(gpus):
-        available_gpus = []
+    def are_gpus_in_stock(gpus):
+        stock_gpus = []
 
         for gpu in gpus:
             status = gpu['status'].lower()
 
             if 'notify' not in status and 'cart' in status:
-                available_gpus.append(gpu)
+                stock_gpus.append(gpu)
 
-        return available_gpus
+        return stock_gpus
 
     @staticmethod
     def get_gpus_from_website():
