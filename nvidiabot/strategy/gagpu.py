@@ -31,6 +31,13 @@ class GAGPU(Strategy):
         self.emails = None
         self.logger = logging.getLogger('nvidiabot')
 
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
+
+        self.client = webdriver.Chrome(chrome_options=options)
+
     def run(self):
         self.logger.info('Checking if Nvidia GPUs are in stock')
 
@@ -89,19 +96,12 @@ class GAGPU(Strategy):
 
         return stock_gpus
 
-    @staticmethod
-    def get_gpus_from_website():
+    def get_gpus_from_website(self):
         url = 'https://www.nvidia.com/en-us/geforce/products/10series/geforce-store/'
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument('--disable-gpu')
-        options.add_argument('--no-sandbox')
+        self.client.get(url)
 
-        client = webdriver.Chrome(chrome_options=options)
-        client.get(url)
-
-        soap = BeautifulSoup(client.page_source, 'html.parser')
+        soap = BeautifulSoup(self.client.page_source, 'html.parser')
         gpu_section_div = soap.find('div', attrs={
             'id': 'section-2'
         })
@@ -125,6 +125,9 @@ class GAGPU(Strategy):
                 'status': gpu_btn_msg
             })
 
-        client.close()
+        self.client.close()
 
         return gpus
+
+    def __del__(self):
+        self.client.quit()
